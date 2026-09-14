@@ -58,7 +58,6 @@ def find_best_split(X, y):
                 X, y, feature, threshold
             )
 
-            # Ignore splits that create an empty group
             if len(y_left) == 0 or len(y_right) == 0:
                 continue
 
@@ -73,5 +72,48 @@ def find_best_split(X, y):
 
 node = Node(feature=0, threshold=3)
 
-print("Feature:", node.feature)
-print("Threshold:", node.threshold)
+def build_tree(X, y, depth=0, max_depth=3):
+
+    if len(np.unique(y)) == 1:
+        return Node(value=np.bincount(y).argmax())
+
+    if depth >= max_depth:
+        return Node(value=np.bincount(y).argmax())
+
+    feature, threshold, impurity = find_best_split(X, y)
+
+    if feature is None:
+        return Node(value=np.bincount(y).argmax())
+
+    X_left, y_left, X_right, y_right = split_data(
+        X, y, feature, threshold
+    )
+
+    left_child = build_tree(X_left, y_left, depth + 1, max_depth)
+    right_child = build_tree(X_right, y_right, depth + 1, max_depth)
+
+    return Node(
+        feature=feature,
+        threshold=threshold,
+        left=left_child,
+        right=right_child
+    )
+
+X = np.array([
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [6]
+])
+
+y = np.array([0, 0, 0, 1, 1, 1])
+
+tree = build_tree(X, y, max_depth=3)
+
+print("Root feature:", tree.feature)
+print("Root threshold:", tree.threshold)
+
+print("Left leaf value:", tree.left.value)
+print("Right leaf value:", tree.right.value)
