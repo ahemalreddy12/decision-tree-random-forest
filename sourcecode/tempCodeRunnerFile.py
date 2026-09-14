@@ -35,6 +35,13 @@ def split_gini(y_left, y_right):
     )
 
     return impurity
+class Node:
+    def __init__(self, feature=None, threshold=None, left=None, right=None, value=None):
+        self.feature = feature
+        self.threshold = threshold
+        self.left = left
+        self.right = right
+        self.value = value
 
 def find_best_split(X, y):
     best_feature = None
@@ -64,19 +71,7 @@ def find_best_split(X, y):
 
     return best_feature, best_threshold, best_gini
 
-X = np.array([
-    [1],
-    [2],
-    [3],
-    [4],
-    [5],
-    [6]
-])
+node = Node(feature=0, threshold=3)
 
-y = np.array([0, 0, 0, 1, 1, 1])
-
-feature, threshold, impurity = find_best_split(X, y)
-
-print("Best feature:", feature)
-print("Best threshold:", threshold)
-print("Best Gini:", impurity)
+print("Feature:", node.feature)
+print("Threshold:", node.threshold)
