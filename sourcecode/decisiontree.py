@@ -116,28 +116,74 @@ def predict(tree, X):
 
     return np.array(predictions)
 
-X_train = np.array([
-    [1],
-    [2],
-    [3],
-    [4],
-    [5],
-    [6]
+def accuracy(y_true, y_pred):
+    return np.mean(y_true == y_pred)
+
+
+def bootstrap_sample(X, y):
+    n_samples = len(X)
+
+    indices = np.random.choice(
+        n_samples,
+        size=n_samples,
+        replace=True
+    )
+
+    return X[indices], y[indices]
+
+class RandomForest:
+    def __init__(self, n_trees=5, max_depth=3):
+        self.n_trees = n_trees
+        self.max_depth = max_depth
+        self.trees = []
+
+    def fit(self, X, y):
+        self.trees = []
+
+        for i in range(self.n_trees):
+            X_sample, y_sample = bootstrap_sample(X, y)
+
+            tree = build_tree(
+                X_sample,
+                y_sample,
+                max_depth=self.max_depth
+            )
+
+            self.trees.append(tree)
+
+    def predict(self, X):
+        all_predictions = []
+
+        for tree in self.trees:
+            predictions = predict(tree, X)
+            all_predictions.append(predictions)
+
+        all_predictions = np.array(all_predictions)
+
+        final_predictions = []
+
+        for i in range(X.shape[0]):
+            votes = all_predictions[:, i]
+            values, counts = np.unique(votes, return_counts=True)
+            final_predictions.append(values[np.argmax(counts)])
+
+        return np.array(final_predictions)
+
+X = np.array([
+    [1], [2], [3], [4], [5],
+    [6], [7], [8], [9], [10]
 ])
 
-y_train = np.array([0, 0, 0, 1, 1, 1])
-
-tree = build_tree(X_train, y_train)
-
-X_test = np.array([
-    [1],
-    [2.5],
-    [3],
-    [4],
-    [5.5],
-    [6]
+y = np.array([
+    0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1
 ])
 
-predictions = predict(tree, X_test)
+forest = RandomForest(n_trees=5, max_depth=3)
 
-print("Predictions:", predictions)
+forest.fit(X, y)
+
+predictions = forest.predict(X)
+
+print("Forest predictions:", predictions)
+print("Accuracy:", accuracy(y, predictions))
