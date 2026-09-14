@@ -116,28 +116,35 @@ def predict(tree, X):
 
     return np.array(predictions)
 
-X_train = np.array([
+def accuracy(y_true, y_pred):
+    return np.mean(y_true == y_pred)
+
+
+def bootstrap_sample(X, y):
+    n_samples = len(X)
+
+    indices = np.random.choice(
+        n_samples,
+        size=n_samples,
+        replace=True
+    )
+
+    return X[indices], y[indices]
+
+X = np.array([
     [1],
     [2],
     [3],
     [4],
-    [5],
-    [6]
+    [5]
 ])
 
-y_train = np.array([0, 0, 0, 1, 1, 1])
+y = np.array([0, 0, 1, 1, 1])
 
-tree = build_tree(X_train, y_train)
+X_sample, y_sample = bootstrap_sample(X, y)
 
-X_test = np.array([
-    [1],
-    [2.5],
-    [3],
-    [4],
-    [5.5],
-    [6]
-])
+print("Bootstrap X:")
+print(X_sample)
 
-predictions = predict(tree, X_test)
-
-print("Predictions:", predictions)
+print("Bootstrap y:")
+print(y_sample)
