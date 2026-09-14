@@ -25,23 +25,20 @@ def split_data(X, y, feature, threshold):
 
     return X_left, y_left, X_right, y_right
 
-X = np.array([
-    [1],
-    [2],
-    [3],
-    [4],
-    [5],
-    [6]
-])
 
-y = np.array([0, 0, 0, 1, 1, 1])
+def split_gini(y_left, y_right):
+    total = len(y_left) + len(y_right)
 
-X_left, y_left, X_right, y_right = split_data(X, y, 0, 3.5)
+    left_weight = len(y_left) / total
+    right_weight = len(y_right) / total
 
-print("Left:")
-print(X_left)
-print(y_left)
+    impurity = (
+        left_weight * gini(y_left)
+        + right_weight * gini(y_right)
+    )
 
-print("Right:")
-print(X_right)
-print(y_right)
+    return impurity
+y_left = np.array([0, 1, 0])
+y_right = np.array([1, 1, 0])
+
+print("Split Gini:", split_gini(y_left, y_right))
