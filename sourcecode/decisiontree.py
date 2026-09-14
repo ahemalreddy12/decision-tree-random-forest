@@ -70,8 +70,6 @@ def find_best_split(X, y):
 
     return best_feature, best_threshold, best_gini
 
-node = Node(feature=0, threshold=3)
-
 def build_tree(X, y, depth=0, max_depth=3):
 
     if len(np.unique(y)) == 1:
@@ -98,3 +96,48 @@ def build_tree(X, y, depth=0, max_depth=3):
         left=left_child,
         right=right_child
     )
+
+def predict_one(node, x):
+    if node.value is not None:
+        return node.value
+
+    
+    if x[node.feature] <= node.threshold:
+        return predict_one(node.left, x)
+    else:
+        return predict_one(node.right, x)
+
+
+def predict(tree, X):
+    predictions = []
+
+    for x in X:
+        predictions.append(predict_one(tree, x))
+
+    return np.array(predictions)
+
+X_train = np.array([
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [6]
+])
+
+y_train = np.array([0, 0, 0, 1, 1, 1])
+
+tree = build_tree(X_train, y_train)
+
+X_test = np.array([
+    [1],
+    [2.5],
+    [3],
+    [4],
+    [5.5],
+    [6]
+])
+
+predictions = predict(tree, X_test)
+
+print("Predictions:", predictions)
