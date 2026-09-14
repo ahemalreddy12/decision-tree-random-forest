@@ -9,9 +9,6 @@ def gini(y):
     return 1 - np.sum(probabilities ** 2)
 
 
-y = np.array([0, 0, 0, 1, 1])
-
-print(gini(y))
 
 def split_data(X, y, feature, threshold):
     left_mask = X[:, feature] <= threshold
@@ -38,7 +35,48 @@ def split_gini(y_left, y_right):
     )
 
     return impurity
-y_left = np.array([0, 1, 0])
-y_right = np.array([1, 1, 0])
 
-print("Split Gini:", split_gini(y_left, y_right))
+def find_best_split(X, y):
+    best_feature = None
+    best_threshold = None
+    best_gini = float("inf")
+
+    n_features = X.shape[1]
+
+    for feature in range(n_features):
+        thresholds = np.unique(X[:, feature])
+
+        for threshold in thresholds:
+            X_left, y_left, X_right, y_right = split_data(
+                X, y, feature, threshold
+            )
+
+            # Ignore splits that create an empty group
+            if len(y_left) == 0 or len(y_right) == 0:
+                continue
+
+            current_gini = split_gini(y_left, y_right)
+
+            if current_gini < best_gini:
+                best_gini = current_gini
+                best_feature = feature
+                best_threshold = threshold
+
+    return best_feature, best_threshold, best_gini
+
+X = np.array([
+    [1],
+    [2],
+    [3],
+    [4],
+    [5],
+    [6]
+])
+
+y = np.array([0, 0, 0, 1, 1, 1])
+
+feature, threshold, impurity = find_best_split(X, y)
+
+print("Best feature:", feature)
+print("Best threshold:", threshold)
+print("Best Gini:", impurity)
